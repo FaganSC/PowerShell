@@ -1,4 +1,8 @@
-Import-Module MSOnline
+if (Get-Module -ListAvailable -Name MSOnline) { 
+    Import-Module MSOnline
+} else { 
+    Install-Module -Name MSOnline
+}
 Connect-MsolService
 
 $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
