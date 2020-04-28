@@ -4,6 +4,7 @@ if (Get-Module -ListAvailable -Name AzureAD) {
     Install-Module -Name AzureAD 
 }
 Connect-AzureAD
+Connect-MsolService
 
 $output = @()
 Get-AzureADDirectoryRole | Foreach-Object {
@@ -12,16 +13,26 @@ Get-AzureADDirectoryRole | Foreach-Object {
     $roleMember = Get-AzureADDirectoryRoleMember -ObjectId $role.ObjectId 
     if ($roleMember.count -gt 0){
         if ($roleMember[0].UserPrincipalName){
-            $roleMember | Get-AzureADUser | Foreach-Object {
+            $roleMember| Foreach-Object {
                 $obj = New-Object -TypeName psobject
-                $obj | Add-Member -MemberType NoteProperty -Name DisplayName -Value $_.DisplayName
-                $obj | Add-Member -MemberType NoteProperty -Name UserPrincipalName -Value $_.UserPrincipalName
-                $obj | Add-Member -MemberType NoteProperty -Name AzureADDirectoryRole -Value $roleName
-                $obj | Add-Member -MemberType NoteProperty -Name Type -Value "User"
+                $obj | Add-Member -MemberType NoteProperty -Name Type -Value $_.ObjectType
+                $obj | Add-Member -MemberType NoteProperty -Name ADDirectoryRole -Value $roleName
+                if ($_.UserPrincipalName){
+                    $userMFA = Get-MsolUser -UserPrincipalName $_.UserPrincipalName
+                    $obj | Add-Member -MemberType NoteProperty -Name User -Value "$($_.DisplayName) ($($_.UserPrincipalName))"
+                } elseif ($_.ServicePrincipalType){
+                    $obj | Add-Member -MemberType NoteProperty -Name User -Value "$($_.DisplayName) ($($_.UserPrincipalName))"
+                    
+                }
+                if ($userMFA.StrongAuthenticationRequirements[0].State){
+                    $obj | Add-Member -MemberType NoteProperty -Name MFA -Value $userMFA.StrongAuthenticationRequirements[0].State
+                } else {
+                    $obj | Add-Member -MemberType NoteProperty -Name MFA -Value "Disabled"
+                }
                 $output += $obj
             }
         }
     }
 }
-$output
+$output | Select-Object User, ADDirectoryRole, Type, MFA | Format-Table -AutoSize
 
