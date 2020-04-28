@@ -10,7 +10,7 @@ $st.RelyingParty = "*"
 $st.State = "Enforced"
 $sta = @($st)
 
-Import-Csv -Path .\..\DataFiles\MFAUsers.csv -Header "UserPrincipalName" | ForEach-Object {
+Import-Csv -Path .\..\..\DataFiles\MFAUsers.csv -Header "UserPrincipalName" | ForEach-Object {
     Write-Host -NoNewline "Enabling MFA for $($_.UserPrincipalName)"
     Try{
         Set-MsolUser -UserPrincipalName $_.UserPrincipalName -StrongAuthenticationRequirements $sta -PasswordNeverExpires $true
