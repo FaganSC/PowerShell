@@ -1,8 +1,5 @@
-if (Get-Module -ListAvailable -Name AzureAD) { 
-    Import-Module AzureAD
-} else { 
-    Install-Module -Name AzureAD 
-}
+if (Get-Module -ListAvailable -Name AzureAD) {  Import-Module AzureAD } else { Install-Module -Name AzureAD }
+if (Get-Module -ListAvailable -Name MSOnline) {  Import-Module MSOnline  } else { Install-Module -Name MSOnline }
 Connect-AzureAD
 Connect-MsolService
 
@@ -35,4 +32,3 @@ Get-AzureADDirectoryRole | Foreach-Object {
     }
 }
 $output | Select-Object User, ADDirectoryRole, Type, MFA | Format-Table -AutoSize
-
