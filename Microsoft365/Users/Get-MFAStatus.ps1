@@ -4,7 +4,7 @@ param (
 )
 if (-not $IsEnabled -and -not $IsDisabled) { $All = $true } else { $All = $false }
 if (Get-Module -ListAvailable -Name MSOnline) { Import-Module MSOnline } else { Install-Module -Name MSOnline }
-#Connect-MsolService
+Connect-MsolService
 $output = @()
 Get-MsolUser | Where-Object { $_.IsLicensed } | ForEach-Object {
     if (($IsEnabled -and $_.StrongAuthenticationRequirements[0].State) -or
