@@ -1,9 +1,6 @@
-if (Get-Module -ListAvailable -Name MSOnline) { 
-    Import-Module MSOnline
-} else { 
-    Install-Module -Name MSOnline
-}
-Connect-MsolService
+if (Get-Module -ListAvailable -Name MSOnline) { Import-Module MSOnline } else { Install-Module -Name MSOnline }
+$testConnection = Get-MsolDomain -ErrorAction SilentlyContinue
+If (-not $testConnection){ Connect-MsolService }
 Set-Location $PSScriptRoot
 $st = New-Object -TypeName Microsoft.Online.Administration.StrongAuthenticationRequirement
 $st.RelyingParty = "*"
